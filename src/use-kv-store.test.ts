@@ -95,9 +95,7 @@ describe('useKVStore', () => {
         expect(TEST_NAMESPACE.put).toHaveBeenCalledWith(
           'test-key',
           JSON.stringify({ key: 'value' }),
-          {
-            expirationTtl: 60 * 60 * 24,
-          },
+          {},
         );
       });
     });

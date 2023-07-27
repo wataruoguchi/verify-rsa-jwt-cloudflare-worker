@@ -2,6 +2,12 @@
 
 This is a lightweight library that verifies a JWT (JSON Web Token) signed with RS256. This is built for [Cloudflare Workers](https://workers.cloudflare.com/).
 
+Although, the project itself has no dependencies. If the runtime supports Web Standard APIs, it should just work :tm:
+
+This package includes the Hono Middleware :fire:
+
+It uses [JWKS](https://datatracker.ietf.org/doc/html/rfc7517#section-4) to verify a JWT. To fetch JWKS, you need to provide the JWKs endpoint URL to JWKS_URI.
+
 ## Install
 
 ```sh
@@ -10,7 +16,7 @@ npm install verify-rsa-jwt-cloudflare-worker
 
 ## Usage
 
-It uses [JWKS](https://datatracker.ietf.org/doc/html/rfc7517#section-4) to verify a JWT. To fetch JWKS, you need to provide the JWKs endpoint URL to JWKS_URI.
+### Module Worker
 
 ```ts
 import { getJwks, useKVStore, verify, VerifyRsaJwtEnv } from 'verify-rsa-jwt-cloudflare-worker';
@@ -38,12 +44,68 @@ compatibility_date = "2023-05-18"
 
 [vars]
 JWKS_URI = "https://<your-authentication-server-host>/.well-known/jwks.json"
+VERIFY_RSA_JWT_JWKS_CACHE_KEY = ""
 
 [[kv_namespaces]]
 binding = "VERIFY_RSA_JWT"
 id = "<ID CREATED BY WRANGLER>"
 preview_id = "<ID CREATED BY WRANGLER>"
 ```
+
+### Hono Middleware
+
+If you are working on a Cloudflare Workers based project, the following parameters can be set via `wrangler.toml`.
+
+#### `VerifyRsaJwtEnv`
+
+| Variable | Description |
+| --- | --- |
+| VERIFY_RSA_JWT | KVNamespace. It want to store downloaded JWKS |
+| VERIFY_RSA_JWT_JWKS_CACHE_KEY | Optional string to specify what key we want to sue to store JWKS. Default: `verify-rsa-jwt-cloudflare-worker-jwks-cache-key` |
+| JWKS_URI | A URI for downloading JWKS. Typically `https://<host>/.well-known/jwks.json` |
+
+Additionally, or, if you are working on a non-Cloudflare Workers based project, such as Node.js, the following optional config values are available:
+
+#### `VerifyRsaJwtConfig`
+
+| Variable | Description |
+| --- | --- |
+| jwksUri | A URI for downloading JWKS. |
+| kvStore | Any storage manager that has `get` and `put`. It's used for storing JWKS. |
+| payloadValidator | Every authentication vendor would configure JWT payload differently. Please give a function that validates the payload and throw an error. |
+| verbose | A debug flag. |
+
+
+#### Import
+
+```ts
+import { Hono } from 'hono'
+import {
+  verifyRsaJwt,
+  getPayloadFromContext,
+} from 'verify-rsa-jwt-cloudflare-worker'
+```
+
+##### Hono Middleware Usage
+
+```ts
+const app = new Hono()
+
+app.use(
+  '/auth/*',
+  verifyRsaJwt({
+    jwksUri: "https://<host>/.well-known/jwks.json",
+    kvStore: // Anything that keeps a value, KVNamespace would work too.
+    payloadValidator: ({payload}) => { /* Validate the payload, throw an error if invalid */ },
+  })
+)
+
+app.get('/auth/page', (c) => {
+  const claims = getPayloadFromContext(c)
+  return c.text('You are authorized')
+})
+```
+
 
 ## Test
 

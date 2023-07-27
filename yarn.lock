@@ -3171,6 +3171,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hono@npm:^3.3.4":
+  version: 3.3.4
+  resolution: "hono@npm:3.3.4"
+  checksum: b0c32bbe067a88bdceaea822301013e6238efcd4d41cab838f1ec7bb498b13b081997c0781da874555295e4fc97b1064555e4844066964e27f5f19ada4c49e50
+  languageName: node
+  linkType: hard
+
 "html-escaper@npm:^2.0.0":
   version: 2.0.2
   resolution: "html-escaper@npm:2.0.2"
@@ -5841,6 +5848,7 @@ __metadata:
     "@typescript-eslint/parser": ^6.2.0
     dotenv: ^16.3.1
     eslint: ^8.45.0
+    hono: ^3.3.4
     jest: ^29.6.1
     jest-environment-miniflare: ^2.14.0
     jsonwebtoken: ^9.0.1

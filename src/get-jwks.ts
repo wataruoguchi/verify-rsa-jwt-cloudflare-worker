@@ -1,9 +1,10 @@
 import { KVStore } from './use-kv-store';
 export type Jwks = { keys: JsonWebKey[] };
-
+const DEFAULT_JWK_CACHE_KEY = 'verify-rsa-jwt-cloudflare-worker-jwks-cache-key';
 export async function getJwks(
-  jwksUri: string | undefined,
+  jwksUri: string,
   kvStore: KVStore,
+  jwkCacheKey?: string,
 ): Promise<Jwks> {
   if (!jwksUri) {
     throw new Error('No JWKS URI provided.');
@@ -15,7 +16,7 @@ export async function getJwks(
   }
   // Fetch the JWKs from KV or the JWKS URI
   const jwks = await kvStore.get<Jwks>(
-    'PUB_JWKS',
+    jwkCacheKey && jwkCacheKey.length > 0 ? jwkCacheKey : DEFAULT_JWK_CACHE_KEY,
     () => fetchJwks(jwksUri),
     validateJwks,
   );

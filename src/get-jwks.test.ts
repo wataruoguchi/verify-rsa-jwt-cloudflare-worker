@@ -73,11 +73,9 @@ describe('getJwks', () => {
 
       it('should cache JWKs', () => {
         expect(TEST_NAMESPACE.put).toHaveBeenCalledWith(
-          'PUB_JWKS',
+          'verify-rsa-jwt-cloudflare-worker-jwks-cache-key',
           JSON.stringify(mockFetchedJwks),
-          {
-            expirationTtl: 60 * 60 * 24,
-          },
+          {},
         );
       });
     });

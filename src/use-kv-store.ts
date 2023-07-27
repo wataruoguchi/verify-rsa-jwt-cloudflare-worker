@@ -1,4 +1,4 @@
-type GeneralKeyValueStore = {
+export type GeneralKeyValueStore = {
   get: (key: string, format: 'json') => Promise<unknown>;
   put: (
     key: string,
@@ -11,7 +11,7 @@ export type KVStore = ReturnType<typeof useKVStore>;
 const defaultValidator = <T>(value: unknown): value is T =>
   !!value && typeof value === 'object' && Object.keys(value).length > 0;
 
-export function useKVStore(kvStore: KVNamespaceOrKeyValueStore) {
+export function useKVStore(kvStore?: KVNamespaceOrKeyValueStore) {
   return {
     async get<T>(
       key: string,
@@ -35,7 +35,6 @@ export function useKVStore(kvStore: KVNamespaceOrKeyValueStore) {
         const freshValue = await fetcher();
         if (validator(freshValue)) {
           await kvStore.put(key, JSON.stringify(freshValue), {
-            expirationTtl: 60 * 60 * 24,
             ...cacheOptions,
           });
           return freshValue;
