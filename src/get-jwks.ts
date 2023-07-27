@@ -2,9 +2,12 @@ import { KVStore } from './use-kv-store';
 export type Jwks = { keys: JsonWebKey[] };
 
 export async function getJwks(
-  jwksUri: string,
+  jwksUri: string | undefined,
   kvStore: KVStore,
 ): Promise<Jwks> {
+  if (!jwksUri) {
+    throw new Error('No JWKS URI provided.');
+  }
   // Fetch the JWKs from KV or the JWKS URI
   const jwks = await kvStore.get<Jwks>(
     'PUB_JWKS',

@@ -5,7 +5,7 @@ export type { KVStore } from './use-kv-store';
 export { verify } from './verify';
 export type { VerificationResult } from './verify';
 
-export interface VerifyRsaJwtEnv {
-  VERIFY_RSA_JWT: KVNamespace;
-  JWKS_URI: string;
-}
+export type VerifyRsaJwtEnv = {
+  VERIFY_RSA_JWT: KVNamespace | undefined;
+  JWKS_URI: string | undefined;
+};

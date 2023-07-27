@@ -1,0 +1,7 @@
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      run: yarn lint:fix
+    format:
+      run: yarn prettier
