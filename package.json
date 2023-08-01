@@ -2,7 +2,7 @@
   "name": "verify-rsa-jwt-cloudflare-worker",
   "description": "Verify RSA JWT on Cloudflare Workers",
   "author": "Wataru Oguchi",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -14,18 +14,21 @@
   "bugs": "https://github.com/wataruoguchi/verify-rsa-jwt-cloudflare-worker/issues",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
   "files": [
     "dist/**/*"
   ],
   "scripts": {
     "start": "wrangler dev src/worker.ts",
     "test": "jest",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
     "lint": "eslint --ext .ts src",
     "lint:fix": "eslint --fix --ext .ts src",
     "prettier": "prettier --write --list-different '**/*.ts' '**/*.json' '**/*.js'",
     "prettier:check": "prettier --check '**/*.ts' '**/*.json' '**/*.js'",
-    "prepublish": "yarn test",
+    "postinstall": "lefthook install",
+    "prepublish": "yarn test && yarn publint",
+    "release": "np",
     "lefthook:pre-commit": "lefthook run pre-commit",
     "gen-pem-keys": "sh ./gen-pem-keys.sh"
   },
@@ -44,8 +47,11 @@
     "jest-environment-miniflare": "^2.14.0",
     "jsonwebtoken": "^9.0.1",
     "lefthook": "^1.4.7",
+    "np": "^8.0.4",
     "pem-jwk": "^2.0.0",
     "prettier": "^3.0.0",
+    "publint": "^0.2.0",
+    "rimraf": "^5.0.1",
     "ts-jest": "^29.1.1",
     "typescript": "^5.1.6",
     "wrangler": "^3.0.0"
