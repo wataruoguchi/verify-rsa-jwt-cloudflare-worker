@@ -28,7 +28,6 @@
     "prettier:check": "prettier --check '**/*.ts' '**/*.json' '**/*.js'",
     "postinstall": "lefthook install",
     "prepublish": "yarn test && yarn publint",
-    "release": "np",
     "lefthook:pre-commit": "lefthook run pre-commit",
     "gen-pem-keys": "sh ./gen-pem-keys.sh"
   },
@@ -47,7 +46,6 @@
     "jest-environment-miniflare": "^2.14.0",
     "jsonwebtoken": "^9.0.1",
     "lefthook": "^1.4.7",
-    "np": "^8.0.4",
     "pem-jwk": "^2.0.0",
     "prettier": "^3.0.0",
     "publint": "^0.2.0",
