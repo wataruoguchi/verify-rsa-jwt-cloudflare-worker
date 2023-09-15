@@ -26,7 +26,6 @@
     "lint:fix": "eslint --fix --ext .ts src",
     "prettier": "prettier --write --list-different '**/*.ts' '**/*.json' '**/*.js'",
     "prettier:check": "prettier --check '**/*.ts' '**/*.json' '**/*.js'",
-    "postinstall": "lefthook install",
     "prepublish": "yarn test && yarn publint",
     "lefthook:pre-commit": "lefthook run pre-commit",
     "gen-pem-keys": "sh ./gen-pem-keys.sh"
