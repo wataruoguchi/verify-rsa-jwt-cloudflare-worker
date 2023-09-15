@@ -19,16 +19,24 @@ npm install verify-rsa-jwt-cloudflare-worker
 ### Module Worker
 
 ```ts
-import { getJwks, useKVStore, verify, VerifyRsaJwtEnv } from 'verify-rsa-jwt-cloudflare-worker';
+import {
+  getJwks,
+  useKVStore,
+  verify,
+  VerifyRsaJwtEnv,
+} from 'verify-rsa-jwt-cloudflare-worker';
 
 export default {
   async fetch(request: Request, env: VerifyRsaJwtEnv): Promise<Response> {
-    const token = request.headers.get('Authorization')?.replace(/Bearer\s+/i, '') || '';
+    const token =
+      request.headers.get('Authorization')?.replace(/Bearer\s+/i, '') || '';
     try {
       const jwks = await getJwks(env.JWKS_URI, useKVStore(env.VERIFY_RSA_JWT));
       const { payload } = await verify(token, jwks);
       // Then, you could validate the payload and return a response
-      return new Response(JSON.stringify({ payload }), { headers: { 'content-type': 'application/json' } });
+      return new Response(JSON.stringify({ payload }), {
+        headers: { 'content-type': 'application/json' },
+      });
     } catch (error: any) {
       return new Response((error as Error).message, { status: 401 });
     }
@@ -58,32 +66,31 @@ If you are working on a Cloudflare Workers based project, the following paramete
 
 #### `VerifyRsaJwtEnv`
 
-| Variable | Description |
-| --- | --- |
-| VERIFY_RSA_JWT | KVNamespace. It want to store downloaded JWKS |
+| Variable                      | Description                                                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| VERIFY_RSA_JWT                | KVNamespace. It want to store downloaded JWKS                                                                                |
 | VERIFY_RSA_JWT_JWKS_CACHE_KEY | Optional string to specify what key we want to sue to store JWKS. Default: `verify-rsa-jwt-cloudflare-worker-jwks-cache-key` |
-| JWKS_URI | A URI for downloading JWKS. Typically `https://<host>/.well-known/jwks.json` |
+| JWKS_URI                      | A URI for downloading JWKS. Typically `https://<host>/.well-known/jwks.json`                                                 |
 
 Additionally, or, if you are working on a non-Cloudflare Workers based project, such as Node.js, the following optional config values are available:
 
 #### `VerifyRsaJwtConfig`
 
-| Variable | Description |
-| --- | --- |
-| jwksUri | A URI for downloading JWKS. |
-| kvStore | Any storage manager that has `get` and `put`. It's used for storing JWKS. |
+| Variable         | Description                                                                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| jwksUri          | A URI for downloading JWKS.                                                                                                                |
+| kvStore          | Any storage manager that has `get` and `put`. It's used for storing JWKS.                                                                  |
 | payloadValidator | Every authentication vendor would configure JWT payload differently. Please give a function that validates the payload and throw an error. |
-| verbose | A debug flag. |
-
+| verbose          | A debug flag.                                                                                                                              |
 
 #### Import
 
 ```ts
-import { Hono } from 'hono'
+import { Hono } from 'hono';
 import {
   verifyRsaJwt,
   getPayloadFromContext,
-} from 'verify-rsa-jwt-cloudflare-worker'
+} from 'verify-rsa-jwt-cloudflare-worker';
 ```
 
 ##### Hono Middleware Usage
@@ -106,7 +113,6 @@ app.get('/auth/page', (c) => {
 })
 ```
 
-
 ## Test
 
 ### Automated tests
@@ -115,9 +121,9 @@ Some tests use [PEM](https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail) files 
 
 1. Create a `.env` file.
 
-    ```sh
-    echo PEM_NAME="test-pem" > .env
-    ```
+   ```sh
+   echo PEM_NAME="test-pem" > .env
+   ```
 
 1. Run `npm run gen-pem-keys` to generate PEM files.
 
@@ -129,27 +135,41 @@ For testing through `src/worker.ts`, you can:
 
 1. Launch a local server
 
-    ```sh
-    npm run start src/worker.ts
-    ```
+   ```sh
+   npm run start src/worker.ts
+   ```
 
 1. cURL with your JWT!
 
-    ```sh
-    url -H "Authorization: Bearer <YOUR-JWT>" http://127.0.0.1:<YOUR-DEV-SERVER-PORT>/
-    ```
+   ```sh
+   url -H "Authorization: Bearer <YOUR-JWT>" http://127.0.0.1:<YOUR-DEV-SERVER-PORT>/
+   ```
 
 1. Then, if everything is set correctly, you'd expect to see something like this:
 
-    ```json
-    {"payload":{"iss":" ... ","sub":" ... ","aud":" ... ","iat":1690401415,"exp":1690487815,"azp":" ... ","gty":" ... "}}
-    ```
+   ```json
+   {
+     "payload": {
+       "iss": " ... ",
+       "sub": " ... ",
+       "aud": " ... ",
+       "iat": 1690401415,
+       "exp": 1690487815,
+       "azp": " ... ",
+       "gty": " ... "
+     }
+   }
+   ```
 
 ## Development
 
 ### Use Wrangler CLI
 
 Please follow this document. [https://developers.cloudflare.com/workers/get-started/guide/](https://developers.cloudflare.com/workers/get-started/guide/).
+
+### Use `lefthook` (option)
+
+Please run `lefthook install` before creating a PR.
 
 ## Learn more about Authentication
 
