@@ -5,7 +5,7 @@ import { getJwks, useKVStore, verify } from '.';
 export type VerifyRsaJwtConfig = {
   jwksUri?: string;
   kvStore?: GeneralKeyValueStore;
-  payloadValidator?: (payload: VerificationResult) => void;
+  payloadValidator?: (payload: VerificationResult, ctx: Context) => void;
   verbose?: boolean;
 };
 
@@ -31,7 +31,7 @@ export function verifyRsaJwt(config?: VerifyRsaJwtConfig): MiddlewareHandler {
       }
 
       // Custom validator that should throw an error if the payload is invalid.
-      config?.payloadValidator?.(result);
+      config?.payloadValidator?.(result, ctx);
 
       // Accessible payload.
       ctx.set(PAYLOAD_KEY, result.payload);
