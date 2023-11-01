@@ -103,7 +103,7 @@ app.use(
   verifyRsaJwt({
     jwksUri: "https://<host>/.well-known/jwks.json",
     kvStore: // Anything that keeps a value, KVNamespace would work too.
-    payloadValidator: ({payload}) => { /* Validate the payload, throw an error if invalid */ },
+    payloadValidator: ({payload, ctx}) => { /* Validate the payload, throw an error if invalid */ },
   })
 )
 
