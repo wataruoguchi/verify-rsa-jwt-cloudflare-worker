@@ -44,7 +44,7 @@ function parseToken(token: string): {
   let payload;
   try {
     // kid = JSON.parse(atob(tokenParts[0])).kid; - kid is optional. Cannot always expect.
-    payload = JSON.parse(atob(tokenParts[1]));
+    payload = JSON.parse(atob(tokenParts[1].replace(/-/g, `+`).replace(/_/g, `/`)));
   } catch (error) {
     throw new Error('Invalid token format');
   }
