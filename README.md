@@ -60,11 +60,26 @@ id = "<ID CREATED BY WRANGLER>"
 preview_id = "<ID CREATED BY WRANGLER>"
 ```
 
-### Hono Middleware
+### Use Without a KV Store
+
+If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, you can simply not pass any cache key to `useKVStore()`.
+
+```ts
+const jwks = await getJwks(
+  'https://<myurl>/.well-known/jwks.json',
+  useKVStore() // no cache key
+)
+```
+
+> [!WARNING]  
+> Not caching the JWKS in a KV store will result in longer response times since the JWKS must be refetched on every request.
+> It can also lead to request throttling from the JWKS provider if your Worker receives a lot of traffic.
+
+## Hono Middleware
 
 If you are working on a Cloudflare Workers based project, the following parameters can be set via `wrangler.toml`.
 
-#### `VerifyRsaJwtEnv`
+### `VerifyRsaJwtEnv`
 
 | Variable                      | Description                                                                                                                  |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -74,7 +89,7 @@ If you are working on a Cloudflare Workers based project, the following paramete
 
 Additionally, or, if you are working on a non-Cloudflare Workers based project, such as Node.js, the following optional config values are available:
 
-#### `VerifyRsaJwtConfig`
+### `VerifyRsaJwtConfig`
 
 | Variable         | Description                                                                                                                                |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -83,7 +98,7 @@ Additionally, or, if you are working on a non-Cloudflare Workers based project, 
 | payloadValidator | Every authentication vendor would configure JWT payload differently. Please give a function that validates the payload and throw an error. |
 | verbose          | A debug flag.                                                                                                                              |
 
-#### Import
+### Import
 
 ```ts
 import { Hono } from 'hono';
@@ -93,7 +108,7 @@ import {
 } from 'verify-rsa-jwt-cloudflare-worker';
 ```
 
-##### Hono Middleware Usage
+### Hono Middleware Usage
 
 ```ts
 const app = new Hono()
