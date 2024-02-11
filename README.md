@@ -79,7 +79,7 @@ const jwks = await getJwks(
 
 If you are working on a Cloudflare Workers based project, the following parameters can be set via `wrangler.toml`.
 
-#### `VerifyRsaJwtEnv`
+### `VerifyRsaJwtEnv`
 
 | Variable                      | Description                                                                                                                  |
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -89,7 +89,7 @@ If you are working on a Cloudflare Workers based project, the following paramete
 
 Additionally, or, if you are working on a non-Cloudflare Workers based project, such as Node.js, the following optional config values are available:
 
-#### `VerifyRsaJwtConfig`
+### `VerifyRsaJwtConfig`
 
 | Variable         | Description                                                                                                                                |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -98,7 +98,7 @@ Additionally, or, if you are working on a non-Cloudflare Workers based project, 
 | payloadValidator | Every authentication vendor would configure JWT payload differently. Please give a function that validates the payload and throw an error. |
 | verbose          | A debug flag.                                                                                                                              |
 
-#### Import
+### Import
 
 ```ts
 import { Hono } from 'hono';
@@ -108,7 +108,7 @@ import {
 } from 'verify-rsa-jwt-cloudflare-worker';
 ```
 
-#### Hono Middleware Usage
+### Hono Middleware Usage
 
 ```ts
 const app = new Hono()
