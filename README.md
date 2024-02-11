@@ -60,7 +60,7 @@ id = "<ID CREATED BY WRANGLER>"
 preview_id = "<ID CREATED BY WRANGLER>"
 ```
 
-### Use Without a KV Store to cache
+### Use Without a KV Store
 
 If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, you can simply not pass any cache key to `useKVStore()`.
 
