@@ -60,7 +60,22 @@ id = "<ID CREATED BY WRANGLER>"
 preview_id = "<ID CREATED BY WRANGLER>"
 ```
 
-### Hono Middleware
+### Use Without a KV Store to cache
+
+If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, you can simply not pass any cache key to `useKVStore()`.
+
+```ts
+const jwks = await getJwks(
+  'https://<myurl>/.well-known/jwks.json',
+  useKVStore() // no cache key
+)
+```
+
+> [!WARNING]  
+> Not caching the JWKS in a KV store will result in longer response times since the JWKS must be refetched on every request.
+> It can also lead to request throttling from the JWKS provider if your Worker receives a lot of traffic.
+
+## Hono Middleware
 
 If you are working on a Cloudflare Workers based project, the following parameters can be set via `wrangler.toml`.
 
@@ -93,7 +108,7 @@ import {
 } from 'verify-rsa-jwt-cloudflare-worker';
 ```
 
-##### Hono Middleware Usage
+#### Hono Middleware Usage
 
 ```ts
 const app = new Hono()
