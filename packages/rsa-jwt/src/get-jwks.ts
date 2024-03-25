@@ -15,6 +15,7 @@ export async function getJwks(
     throw new Error('Invalid JWKS URI');
   }
   // Fetch the JWKs from KV or the JWKS URI
+
   const jwks = await kvStore.get<Jwks>(
     jwkCacheKey && jwkCacheKey.length > 0 ? jwkCacheKey : DEFAULT_JWK_CACHE_KEY,
     () => fetchJwks(jwksUri),

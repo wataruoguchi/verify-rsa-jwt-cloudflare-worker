@@ -67,8 +67,8 @@ If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, 
 ```ts
 const jwks = await getJwks(
   'https://<myurl>/.well-known/jwks.json',
-  useKVStore() // no cache key
-)
+  useKVStore(), // no cache key
+);
 ```
 
 > [!WARNING]  
@@ -181,10 +181,6 @@ For testing through `src/worker.ts`, you can:
 ### Use Wrangler CLI
 
 Please follow this document. [https://developers.cloudflare.com/workers/get-started/guide/](https://developers.cloudflare.com/workers/get-started/guide/).
-
-### Use `lefthook` (option)
-
-Please run `lefthook install` before creating a PR.
 
 ## Learn more about Authentication
 
