@@ -1,7 +1,7 @@
-import { getMockFetcher, mockJwksUri } from '../test-helpers/get-mock-fetcher';
-import type { Jwks } from './get-jwks';
-import { getJwks } from './get-jwks';
-import { KVStore, useKVStore } from './use-kv-store';
+import { getMockFetcher, mockJwksUri } from "../test-helpers/get-mock-fetcher";
+import type { Jwks } from "./get-jwks";
+import { getJwks } from "./get-jwks";
+import { KVStore, useKVStore } from "./use-kv-store";
 
 // Mock the KVStore
 const { TEST_NAMESPACE } = getMiniflareBindings();
@@ -9,7 +9,7 @@ TEST_NAMESPACE.get = jest.fn();
 TEST_NAMESPACE.put = jest.fn();
 
 const mockFetcher = getMockFetcher<Jwks>();
-describe('getJwks', () => {
+describe("getJwks", () => {
   let kvStore: KVStore;
 
   beforeEach(() => {
@@ -22,103 +22,103 @@ describe('getJwks', () => {
     jest.clearAllMocks();
   });
 
-  describe('cached value is valid', () => {
+  describe("cached value is valid", () => {
     let mockCachedJwks: Jwks;
     let result: Jwks;
 
     beforeEach(async () => {
       // Mock the get method to return a valid cached JWKs
-      mockCachedJwks = { keys: [{ kty: 'RSA' }] };
+      mockCachedJwks = { keys: [{ kty: "RSA" }] };
       TEST_NAMESPACE.get.mockResolvedValueOnce(mockCachedJwks);
 
       // Call the getJwks function
       result = await getJwks(mockJwksUri, kvStore);
     });
 
-    it('should return JWKs from cache when valid', () => {
+    it("should return JWKs from cache when valid", () => {
       expect(result).toEqual(mockCachedJwks);
     });
 
-    it('should get JWKs from cache (KV)', () => {
+    it("should get JWKs from cache (KV)", () => {
       expect(TEST_NAMESPACE.get).toHaveBeenCalled();
     });
 
-    it('should not try caching (fetching JWKs)', () => {
+    it("should not try caching (fetching JWKs)", () => {
       expect(TEST_NAMESPACE.put).not.toHaveBeenCalled();
     });
   });
 
-  describe('when cache is not configured', () => {
+  describe("when cache is not configured", () => {
     let mockFetchedJwks: Jwks;
     let result: Jwks;
 
-    describe('fetch succeeds', () => {
+    describe("fetch succeeds", () => {
       beforeEach(async () => {
         // Mock the fetchJwks function to return a valid JWKs
-        mockFetchedJwks = { keys: [{ kty: 'RSA' }] };
+        mockFetchedJwks = { keys: [{ kty: "RSA" }] };
         mockFetcher(true, mockFetchedJwks);
 
         // Call the getJwks function
         result = await getJwks(mockJwksUri);
       });
 
-      it('should fetch JWKs', () => {
+      it("should fetch JWKs", () => {
         expect(result).toEqual(mockFetchedJwks);
       });
 
-      it('should cache JWKs', () => {
+      it("should cache JWKs", () => {
         expect(TEST_NAMESPACE.put).not.toHaveBeenCalled();
       });
     });
   });
 
-  describe('cached value is invalid', () => {
+  describe("cached value is invalid", () => {
     let mockFetchedJwks: Jwks;
     let result: Jwks;
 
     beforeEach(() => {
       // Mock the get method to return an invalid cached JWKs
-      TEST_NAMESPACE.get.mockResolvedValueOnce({ keys: 'not-an-array' });
+      TEST_NAMESPACE.get.mockResolvedValueOnce({ keys: "not-an-array" });
     });
 
-    describe('fetch succeeds', () => {
+    describe("fetch succeeds", () => {
       beforeEach(async () => {
         // Mock the fetchJwks function to return a valid JWKs
-        mockFetchedJwks = { keys: [{ kty: 'RSA' }] };
+        mockFetchedJwks = { keys: [{ kty: "RSA" }] };
         mockFetcher(true, mockFetchedJwks);
 
         // Call the getJwks function
         result = await getJwks(mockJwksUri, kvStore);
       });
 
-      it('should fetch JWKs', () => {
+      it("should fetch JWKs", () => {
         expect(result).toEqual(mockFetchedJwks);
       });
 
-      it('should cache JWKs', () => {
+      it("should cache JWKs", () => {
         expect(TEST_NAMESPACE.put).toHaveBeenCalledWith(
-          'verify-rsa-jwt-cloudflare-worker-jwks-cache-key',
+          "verify-rsa-jwt-cloudflare-worker-jwks-cache-key",
           JSON.stringify(mockFetchedJwks),
           {},
         );
       });
     });
 
-    describe('fetch fails', () => {
+    describe("fetch fails", () => {
       beforeEach(async () => {
         // Mock the fetchJwks function to return a valid JWKs
-        mockFetchedJwks = { keys: [{ kty: 'RSA' }] };
+        mockFetchedJwks = { keys: [{ kty: "RSA" }] };
         // "false" means the fetch will fail
         mockFetcher(false, mockFetchedJwks);
       });
 
-      it('should throw an error', async () => {
+      it("should throw an error", async () => {
         await expect(getJwks(mockJwksUri, kvStore)).rejects.toThrow(
           /^Failed to fetch JWKs/,
         );
       });
 
-      it('should not cache JWKs', () => {
+      it("should not cache JWKs", () => {
         expect(TEST_NAMESPACE.put).not.toHaveBeenCalled();
       });
     });

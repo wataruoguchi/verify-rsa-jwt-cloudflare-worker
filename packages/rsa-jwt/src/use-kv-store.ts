@@ -1,5 +1,5 @@
 export type GeneralKeyValueStore = {
-  get: (key: string, format: 'json') => Promise<unknown>;
+  get: (key: string, format: "json") => Promise<unknown>;
   put: (
     key: string,
     value: string,
@@ -9,7 +9,7 @@ export type GeneralKeyValueStore = {
 export type KVNamespaceOrKeyValueStore = KVNamespace | GeneralKeyValueStore;
 export type KVStore = ReturnType<typeof useKVStore>;
 const defaultValidator = <T>(value: unknown): value is T =>
-  !!value && typeof value === 'object' && Object.keys(value).length > 0;
+  !!value && typeof value === "object" && Object.keys(value).length > 0;
 
 export function useKVStore(kvStore?: KVNamespaceOrKeyValueStore) {
   return {
@@ -25,10 +25,10 @@ export function useKVStore(kvStore?: KVNamespaceOrKeyValueStore) {
         if (validator(freshValue)) {
           return freshValue;
         }
-        throw new Error('Invalid value: ' + JSON.stringify(freshValue));
+        throw new Error("Invalid value: " + JSON.stringify(freshValue));
       }
 
-      const cachedValue = await kvStore.get(key, 'json');
+      const cachedValue = await kvStore.get(key, "json");
       if (validator(cachedValue)) {
         return cachedValue;
       } else {
@@ -39,7 +39,7 @@ export function useKVStore(kvStore?: KVNamespaceOrKeyValueStore) {
           });
           return freshValue;
         }
-        throw new Error('Invalid value: ' + JSON.stringify(freshValue));
+        throw new Error("Invalid value: " + JSON.stringify(freshValue));
       }
     },
   };

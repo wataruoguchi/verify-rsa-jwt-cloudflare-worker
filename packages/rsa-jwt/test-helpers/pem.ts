@@ -1,12 +1,12 @@
-import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-import * as jwt from 'jsonwebtoken';
-import * as path from 'path';
-import { pem2jwk } from 'pem-jwk';
+import * as dotenv from "dotenv";
+import * as fs from "fs";
+import * as jwt from "jsonwebtoken";
+import * as path from "path";
+import { pem2jwk } from "pem-jwk";
 
 dotenv.config();
 
-const KEY_ID = 'matching-kid';
+const KEY_ID = "matching-kid";
 
 // Replace with your actual RSA private key
 function getPrivatePem() {
@@ -21,15 +21,15 @@ function getPublicPemStr() {
   // Please run `gen-pem-key` script to generate the RSA key pair
   return fs.readFileSync(
     path.resolve(process.cwd(), publicPemFileName),
-    'utf8',
+    "utf8",
   );
 }
 
 export function getJwk() {
   // Convert PEM public key to JWK format
   return pem2jwk(getPublicPemStr(), {
-    alg: 'RS256',
-    use: 'sig',
+    alg: "RS256",
+    use: "sig",
     kid: KEY_ID,
   });
 }
@@ -42,7 +42,7 @@ export function getToken(
   keyid?: string,
 ) {
   return jwt.sign(payload, getPrivatePem(), {
-    algorithm: 'RS256',
+    algorithm: "RS256",
     keyid: keyid || KEY_ID,
   });
 }

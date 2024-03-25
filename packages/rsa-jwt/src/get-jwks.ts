@@ -1,18 +1,18 @@
-import { KVStore } from './use-kv-store';
+import { KVStore } from "./use-kv-store";
 export type Jwks = { keys: JsonWebKey[] };
-const DEFAULT_JWK_CACHE_KEY = 'verify-rsa-jwt-cloudflare-worker-jwks-cache-key';
+const DEFAULT_JWK_CACHE_KEY = "verify-rsa-jwt-cloudflare-worker-jwks-cache-key";
 export async function getJwks(
   jwksUri: string,
   kvStore?: KVStore,
   jwkCacheKey?: string,
 ): Promise<Jwks> {
   if (!jwksUri) {
-    throw new Error('No JWKS URI provided.');
+    throw new Error("No JWKS URI provided.");
   }
   try {
     new URL(jwksUri);
   } catch (error) {
-    throw new Error('Invalid JWKS URI');
+    throw new Error("Invalid JWKS URI");
   }
   if (kvStore) {
     // Fetch the JWKs from KV or the JWKS URI
@@ -36,11 +36,11 @@ async function fetchJwks(jwksUri: string): Promise<Jwks> {
     response = await fetch(jwksUri);
   } catch (e) {
     throw new Error(
-      'Failed to request on fetching JWKs: ' + (e as Error).message,
+      "Failed to request on fetching JWKs: " + (e as Error).message,
     );
   }
-  if (!response.ok || !response.status.toString().startsWith('2')) {
-    throw new Error('Failed to fetch JWKs: ' + response.statusText);
+  if (!response.ok || !response.status.toString().startsWith("2")) {
+    throw new Error("Failed to fetch JWKs: " + response.statusText);
   }
   const jwks: { keys: JsonWebKey[] } = await response.json();
   return jwks;
@@ -49,8 +49,8 @@ async function fetchJwks(jwksUri: string): Promise<Jwks> {
 function validateJwks(value: unknown): value is Jwks {
   return (
     value !== null &&
-    typeof value === 'object' &&
-    'keys' in value &&
+    typeof value === "object" &&
+    "keys" in value &&
     Array.isArray(value.keys)
   );
 }

@@ -1,5 +1,5 @@
-export const mockOrigin = 'https://example.com';
-export const mockPath = '/.well-known/jwks.json';
+export const mockOrigin = "https://example.com";
+export const mockPath = "/.well-known/jwks.json";
 export const mockJwksUri = `${mockOrigin}${mockPath}`;
 
 export function getMockFetcher<T>() {
@@ -17,7 +17,7 @@ export function getMockFetcher<T>() {
     // (see https://undici.nodejs.org/#/docs/api/MockPool?id=mockpoolinterceptoptions)
     // There is no way that I can set 'ok' property with this library. Use status code instead.
     origin
-      .intercept({ method: 'GET', path: mockPath })
+      .intercept({ method: "GET", path: mockPath })
       .reply(ok ? 200 : 401, JSON.stringify(json));
   };
 }
