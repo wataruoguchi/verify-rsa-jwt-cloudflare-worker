@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import {
+  Jwks,
   VerificationResult,
   VerifyRsaJwtEnv,
   getPayloadFromContext,
@@ -70,6 +71,84 @@ describe('Hono Middleware', () => {
         verifyRsaJwt({
           jwksUri: mockJwksUri,
           kvStore: generalKeyValueStore,
+          payloadValidator,
+          verbose: false,
+        }),
+      );
+      hono.get('/protected', (ctx) => ctx.json(getPayloadFromContext(ctx)));
+      token = getToken({ name: 'Wataru Oguchi' });
+    });
+
+    describe('when the token is valid', () => {
+      let response: Response;
+      describe('and the payload is valid', () => {
+        beforeEach(async () => {
+          const req = new Request('http://localhost/protected', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          response = await hono.fetch(req);
+        });
+
+        it('should return 200', () => {
+          expect(response.status).toEqual(200);
+        });
+
+        it('should return the claims with this test endpoint', async () => {
+          await expect(response.json()).resolves.toEqual({
+            name: 'Wataru Oguchi',
+            iat: expect.any(Number),
+          });
+        });
+      });
+
+      describe('and the payload is invalid', () => {
+        beforeEach(async () => {
+          const req = new Request('http://localhost/protected', {
+            headers: {
+              Authorization: `Bearer ${getToken({ name: 'Yuki the dog' })}`,
+            },
+          });
+          response = await hono.fetch(req);
+        });
+
+        it('should return 401', () => {
+          expect(response.status).toEqual(401);
+        });
+      });
+    });
+
+    describe('when the token is invalid', () => {
+      let response: Response;
+      beforeEach(async () => {
+        const req = new Request('http://localhost/protected', {
+          headers: {
+            Authorization: `Bearer ${token}invalid`,
+          },
+        });
+        response = await hono.fetch(req);
+      });
+
+      it('should return 401', () => {
+        expect(response.status).toEqual(401);
+      });
+    });
+  });
+
+  describe('When the JWKS is given as a config', () => {
+    let hono: Hono;
+    let token: string;
+    let jwks: Jwks;
+    beforeEach(() => {
+      jwks = { keys: [getJwk()] };
+
+      hono = new Hono();
+      hono.use(
+        '/protected/*',
+        verifyRsaJwt({
+          jwksUri: mockJwksUri,
+          jwks,
           payloadValidator,
           verbose: false,
         }),

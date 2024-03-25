@@ -24,18 +24,18 @@ import {
   useKVStore,
   verify,
   VerifyRsaJwtEnv,
-} from 'verify-rsa-jwt-cloudflare-worker';
+} from "verify-rsa-jwt-cloudflare-worker";
 
 export default {
   async fetch(request: Request, env: VerifyRsaJwtEnv): Promise<Response> {
     const token =
-      request.headers.get('Authorization')?.replace(/Bearer\s+/i, '') || '';
+      request.headers.get("Authorization")?.replace(/Bearer\s+/i, "") || "";
     try {
       const jwks = await getJwks(env.JWKS_URI, useKVStore(env.VERIFY_RSA_JWT));
       const { payload } = await verify(token, jwks);
       // Then, you could validate the payload and return a response
       return new Response(JSON.stringify({ payload }), {
-        headers: { 'content-type': 'application/json' },
+        headers: { "content-type": "application/json" },
       });
     } catch (error: any) {
       return new Response((error as Error).message, { status: 401 });
@@ -65,10 +65,10 @@ preview_id = "<ID CREATED BY WRANGLER>"
 If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, you can omit the second parameter.
 
 ```ts
-const jwks = await getJwks('https://<myurl>/.well-known/jwks.json');
+const jwks = await getJwks("https://<myurl>/.well-known/jwks.json");
 ```
 
-> [!WARNING]  
+> [!WARNING]
 > Not caching the JWKS in a KV store will result in longer response times since the JWKS must be refetched on every request.
 > It can also lead to request throttling from the JWKS provider if your Worker receives a lot of traffic.
 
@@ -83,6 +83,7 @@ If you are working on a Cloudflare Workers based project, the following paramete
 | VERIFY_RSA_JWT                | KVNamespace. It want to store downloaded JWKS                                                                                |
 | VERIFY_RSA_JWT_JWKS_CACHE_KEY | Optional string to specify what key we want to sue to store JWKS. Default: `verify-rsa-jwt-cloudflare-worker-jwks-cache-key` |
 | JWKS_URI                      | A URI for downloading JWKS. Typically `https://<host>/.well-known/jwks.json`                                                 |
+| JWKS                          | Optional. Instead of giving the URI, You could provide hardcoded jwks.                                                       |
 
 Additionally, or, if you are working on a non-Cloudflare Workers based project, such as Node.js, the following optional config values are available:
 
@@ -91,6 +92,7 @@ Additionally, or, if you are working on a non-Cloudflare Workers based project, 
 | Variable         | Description                                                                                                                                |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | jwksUri          | A URI for downloading JWKS.                                                                                                                |
+| jwks             | Optional. Instead of giving the URI, You could provide hardcoded jwks.                                                                     |
 | kvStore          | Any storage manager that has `get` and `put`. It's used for storing JWKS.                                                                  |
 | payloadValidator | Every authentication vendor would configure JWT payload differently. Please give a function that validates the payload and throw an error. |
 | verbose          | A debug flag.                                                                                                                              |
@@ -98,11 +100,11 @@ Additionally, or, if you are working on a non-Cloudflare Workers based project, 
 ### Import
 
 ```ts
-import { Hono } from 'hono';
+import { Hono } from "hono";
 import {
   verifyRsaJwt,
   getPayloadFromContext,
-} from 'verify-rsa-jwt-cloudflare-worker';
+} from "verify-rsa-jwt-cloudflare-worker";
 ```
 
 ### Hono Middleware Usage

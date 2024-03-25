@@ -1,33 +1,35 @@
-import type { Context, MiddlewareHandler } from 'hono';
-import type { GeneralKeyValueStore, VerificationResult } from '.';
-import { getJwks, useKVStore, verify } from '.';
+import type { Context, MiddlewareHandler } from "hono";
+import type { GeneralKeyValueStore, Jwks, VerificationResult } from ".";
+import { getJwks, useKVStore, verify } from ".";
 
 export type VerifyRsaJwtConfig = {
   jwksUri?: string;
+  jwks?: Jwks;
   kvStore?: GeneralKeyValueStore;
   payloadValidator?: (payload: VerificationResult, ctx: Context) => void;
   verbose?: boolean;
 };
 
-const PAYLOAD_KEY = 'verifyRsaJwtPayload';
+const PAYLOAD_KEY = "verifyRsaJwtPayload";
 
 export function verifyRsaJwt(config?: VerifyRsaJwtConfig): MiddlewareHandler {
   return async (ctx: Context, next) => {
-    const jwtToken = ctx.req.headers
-      .get('Authorization')
-      ?.replace(/Bearer\s+/i, '');
+    const jwtToken = ctx.req.header("Authorization")?.replace(/Bearer\s+/i, "");
     if (!jwtToken || jwtToken.length === 0) {
-      return new Response('Bad Request', { status: 400 });
+      return new Response("Bad Request", { status: 400 });
     }
     try {
-      const jwks = await getJwks(
-        config?.jwksUri || ctx.env.JWKS_URI,
-        useKVStore(config?.kvStore || ctx.env?.VERIFY_RSA_JWT),
-        ctx.env?.VERIFY_RSA_JWT_JWKS_CACHE_KEY,
-      );
+      const jwks =
+        config?.jwks ||
+        ctx.env?.JWKS ||
+        (await getJwks(
+          config?.jwksUri || ctx.env?.JWKS_URI,
+          useKVStore(config?.kvStore || ctx.env?.VERIFY_RSA_JWT),
+          ctx.env?.VERIFY_RSA_JWT_JWKS_CACHE_KEY,
+        ));
       const result = await verify(jwtToken, jwks);
       if (result.payload === null) {
-        throw new Error('Invalid token');
+        throw new Error("Invalid token");
       }
 
       // Custom validator that should throw an error if the payload is invalid.
@@ -38,7 +40,7 @@ export function verifyRsaJwt(config?: VerifyRsaJwtConfig): MiddlewareHandler {
       await next();
     } catch (error) {
       config?.verbose &&
-        console.error({ message: 'verification failed', error });
+        console.error({ message: "verification failed", error });
       return new Response((error as Error).message, { status: 401 });
     }
   };
