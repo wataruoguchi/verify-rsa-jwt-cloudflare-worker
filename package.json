@@ -7,6 +7,5 @@
     "packages/rsa-jwt",
     "example/hono-app"
   ],
-  "scripts": {},
-  "devDependencies": {}
+  "scripts": {}
 }

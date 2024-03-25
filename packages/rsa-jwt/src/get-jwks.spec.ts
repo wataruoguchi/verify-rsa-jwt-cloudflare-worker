@@ -48,6 +48,30 @@ describe('getJwks', () => {
     });
   });
 
+  describe('when cache is not configured', () => {
+    let mockFetchedJwks: Jwks;
+    let result: Jwks;
+
+    describe('fetch succeeds', () => {
+      beforeEach(async () => {
+        // Mock the fetchJwks function to return a valid JWKs
+        mockFetchedJwks = { keys: [{ kty: 'RSA' }] };
+        mockFetcher(true, mockFetchedJwks);
+
+        // Call the getJwks function
+        result = await getJwks(mockJwksUri);
+      });
+
+      it('should fetch JWKs', () => {
+        expect(result).toEqual(mockFetchedJwks);
+      });
+
+      it('should cache JWKs', () => {
+        expect(TEST_NAMESPACE.put).not.toHaveBeenCalled();
+      });
+    });
+  });
+
   describe('cached value is invalid', () => {
     let mockFetchedJwks: Jwks;
     let result: Jwks;

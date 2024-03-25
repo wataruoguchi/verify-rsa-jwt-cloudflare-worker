@@ -34,3 +34,5 @@ wrangler.toml
 # PEM
 *.pem
 .env
+
+coverage

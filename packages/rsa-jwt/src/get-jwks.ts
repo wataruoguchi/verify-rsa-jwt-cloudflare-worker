@@ -3,7 +3,7 @@ export type Jwks = { keys: JsonWebKey[] };
 const DEFAULT_JWK_CACHE_KEY = 'verify-rsa-jwt-cloudflare-worker-jwks-cache-key';
 export async function getJwks(
   jwksUri: string,
-  kvStore: KVStore,
+  kvStore?: KVStore,
   jwkCacheKey?: string,
 ): Promise<Jwks> {
   if (!jwksUri) {
@@ -14,14 +14,20 @@ export async function getJwks(
   } catch (error) {
     throw new Error('Invalid JWKS URI');
   }
-  // Fetch the JWKs from KV or the JWKS URI
+  if (kvStore) {
+    // Fetch the JWKs from KV or the JWKS URI
 
-  const jwks = await kvStore.get<Jwks>(
-    jwkCacheKey && jwkCacheKey.length > 0 ? jwkCacheKey : DEFAULT_JWK_CACHE_KEY,
-    () => fetchJwks(jwksUri),
-    validateJwks,
-  );
-  return jwks;
+    const jwks = await kvStore.get<Jwks>(
+      jwkCacheKey && jwkCacheKey.length > 0
+        ? jwkCacheKey
+        : DEFAULT_JWK_CACHE_KEY,
+      () => fetchJwks(jwksUri),
+      validateJwks,
+    );
+    return jwks;
+  } else {
+    return await fetchJwks(jwksUri);
+  }
 }
 
 async function fetchJwks(jwksUri: string): Promise<Jwks> {

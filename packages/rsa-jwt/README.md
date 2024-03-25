@@ -62,13 +62,10 @@ preview_id = "<ID CREATED BY WRANGLER>"
 
 ### Use Without a KV Store
 
-If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, you can simply not pass any cache key to `useKVStore()`.
+If you do not want to use a KV store to cache the JWKS returned by `getJwks()`, you can omit the second parameter.
 
 ```ts
-const jwks = await getJwks(
-  'https://<myurl>/.well-known/jwks.json',
-  useKVStore(), // no cache key
-);
+const jwks = await getJwks('https://<myurl>/.well-known/jwks.json');
 ```
 
 > [!WARNING]  
