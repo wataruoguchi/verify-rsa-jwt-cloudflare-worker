@@ -51,7 +51,7 @@ name = "verify-rsa-jwt-cloudflare-worker"
 compatibility_date = "2023-05-18"
 
 [vars]
-JWKS_URI = "https://<your-authentication-server-host>/.well-known/jwks.json"
+JWKS_URI = "https://<your-authorization-server-host>/.well-known/jwks.json"
 VERIFY_RSA_JWT_JWKS_CACHE_KEY = ""
 
 [[kv_namespaces]]
@@ -73,6 +73,8 @@ const jwks = await getJwks("https://<myurl>/.well-known/jwks.json");
 > It can also lead to request throttling from the JWKS provider if your Worker receives a lot of traffic.
 
 ## Hono Middleware
+
+The middleware provides authentication by verifying the token with RSA-JWT. Authorization header value or cookie value specified by the cookie option will be used as a token.
 
 If you are working on a Cloudflare Workers based project, the following parameters can be set via `wrangler.toml`.
 
@@ -104,10 +106,13 @@ import { Hono } from "hono";
 import {
   verifyRsaJwt,
   getPayloadFromContext,
+  createGetCookieByKey,
 } from "verify-rsa-jwt-cloudflare-worker";
 ```
 
 ### Hono Middleware Usage
+
+Scenario 1: When the token is given via the Authorization header.
 
 ```ts
 const app = new Hono()
@@ -116,15 +121,36 @@ app.use(
   '/auth/*',
   verifyRsaJwt({
     jwksUri: "https://<host>/.well-known/jwks.json",
-    kvStore: // Anything that keeps a value, KVNamespace would work too.
+    kvStore: // Anything that keeps a value, KVNamespace should work too.
     payloadValidator: ({payload, ctx}) => { /* Validate the payload, throw an error if invalid */ },
   })
 )
+```
 
-app.get('/auth/page', (c) => {
-  const claims = getPayloadFromContext(c)
-  return c.text('You are authorized')
-})
+Scenario 2: When the token is given via the Cookie header.
+
+```ts
+import { getCookie } from "hono/cookie";
+const app = new Hono()
+
+app.use(
+  '/auth/*',
+  verifyRsaJwt({
+    getCookieByKey: createGetCookieByKey(getCookie, "access_token"), // "access_token" is an example cookie key name where you want to fetch a JWT from.
+    jwksUri: "https://<host>/.well-known/jwks.json",
+    kvStore: // Anything that keeps a value, KVNamespace should work too.
+    payloadValidator: ({payload, ctx}) => { /* Validate the payload, throw an error if invalid */ },
+  })
+)
+```
+
+Get payload:
+
+```ts
+app.get("/auth/page", (c) => {
+  const claims = getPayloadFromContext(c);
+  return c.text("You are authorized");
+});
 ```
 
 ## Test

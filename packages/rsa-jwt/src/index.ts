@@ -1,3 +1,4 @@
+export { createGetCookieByKey, type GetCookieByKey } from "./get-cookie-by-key";
 export { getJwks } from "./get-jwks";
 export type { Jwks } from "./get-jwks";
 export { getPayloadFromContext, verifyRsaJwt } from "./hono-middleware";

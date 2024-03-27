@@ -1,8 +1,11 @@
 import { Hono } from "hono";
+import { getCookie } from "hono/cookie";
+
 import {
   Jwks,
   VerificationResult,
   VerifyRsaJwtEnv,
+  createGetCookieByKey,
   getPayloadFromContext,
   verifyRsaJwt,
 } from ".";
@@ -210,6 +213,54 @@ describe("Hono Middleware", () => {
 
       it("should return 401", () => {
         expect(response.status).toEqual(401);
+      });
+    });
+  });
+
+  describe("When the JWT is given via the cookie header", () => {
+    let hono: Hono;
+    let token: string;
+    let jwks: Jwks;
+    beforeEach(() => {
+      jwks = { keys: [getJwk()] };
+
+      hono = new Hono();
+      hono.use(
+        "/protected/*",
+        verifyRsaJwt({
+          getCookieByKey: createGetCookieByKey(getCookie, "token"),
+          jwksUri: mockJwksUri,
+          jwks,
+          payloadValidator,
+          verbose: false,
+        }),
+      );
+      hono.get("/protected", (ctx) => ctx.json(getPayloadFromContext(ctx)));
+      token = getToken({ name: "Wataru Oguchi" });
+    });
+
+    describe("when the token is valid", () => {
+      let response: Response;
+      describe("and the payload is valid", () => {
+        beforeEach(async () => {
+          const req = new Request("http://localhost/protected", {
+            headers: {
+              Cookie: `token=${token}`,
+            },
+          });
+          response = await hono.fetch(req);
+        });
+
+        it("should return 200", () => {
+          expect(response.status).toEqual(200);
+        });
+
+        it("should return the claims with this test endpoint", async () => {
+          await expect(response.json()).resolves.toEqual({
+            name: "Wataru Oguchi",
+            iat: expect.any(Number),
+          });
+        });
       });
     });
   });

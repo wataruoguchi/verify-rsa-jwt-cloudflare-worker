@@ -1,8 +1,14 @@
 import type { Context, MiddlewareHandler } from "hono";
-import type { GeneralKeyValueStore, Jwks, VerificationResult } from ".";
+import type {
+  GeneralKeyValueStore,
+  GetCookieByKey,
+  Jwks,
+  VerificationResult,
+} from ".";
 import { getJwks, useKVStore, verify } from ".";
 
 export type VerifyRsaJwtConfig = {
+  getCookieByKey?: GetCookieByKey;
   jwksUri?: string;
   jwks?: Jwks;
   kvStore?: GeneralKeyValueStore;
@@ -14,7 +20,9 @@ const PAYLOAD_KEY = "verifyRsaJwtPayload";
 
 export function verifyRsaJwt(config?: VerifyRsaJwtConfig): MiddlewareHandler {
   return async (ctx: Context, next) => {
-    const jwtToken = ctx.req.header("Authorization")?.replace(/Bearer\s+/i, "");
+    const jwtToken =
+      ctx.req.header("Authorization")?.replace(/Bearer\s+/i, "") ||
+      config?.getCookieByKey?.(ctx);
     if (!jwtToken || jwtToken.length === 0) {
       return new Response("Bad Request", { status: 400 });
     }
